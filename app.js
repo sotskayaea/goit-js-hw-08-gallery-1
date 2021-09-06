@@ -147,12 +147,14 @@ function onSwitchPicture (){
         nextIndex = 0;
       }
       lightBoxImage.src = galleryItems[nextIndex].original;
+      lightBoxImage.alt = galleryItems[nextIndex].description;
     }
     if (event.code === 'ArrowLeft') {
       if (previousIndex < 0) {
         previousIndex = galleryItems.length - 1;
       }
       lightBoxImage.src = galleryItems[previousIndex].original;
+      lightBoxImage.alt = galleryItems[previousIndex].description;
     }
   })
 }
