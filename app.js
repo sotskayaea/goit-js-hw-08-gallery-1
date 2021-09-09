@@ -63,10 +63,19 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
-const galleryMarkupList = document.querySelector('.gallery');
-const galleryMarkupItems = createGalleryItems(galleryItems)
-galleryMarkupList.insertAdjacentHTML('afterbegin' , galleryMarkupItems);
-galleryMarkupList.addEventListener('click' , onClickOnPicture)
+
+const refs = {
+  galleryMarkupList: document.querySelector('.gallery'),
+  lightbox : document.querySelector('.lightbox'),
+  lightboxImage : document.querySelector('.lightbox__image'),
+  closeModalBtn : document.querySelector('button[data-action="close-lightbox"]'),
+  lightboxOverlay : document.querySelector('.lightbox__overlay'),
+}
+
+const galleryMarkupItems = createGalleryItems(galleryItems);
+refs.galleryMarkupList.addEventListener('click' , onClickOnPicture)
+refs.galleryMarkupList.insertAdjacentHTML('afterbegin' , galleryMarkupItems);
+
 function createGalleryItems (items){
   return items.map(({preview , original , description}) => {
     return `<li class="gallery__item">
@@ -97,43 +106,44 @@ function onClickOnPicture (event){
   if(!event.target.classList.contains('gallery__image')){
     return
   }
-  const lightbox = document.querySelector('.lightbox');
-  const lightboxImage = document.querySelector('.lightbox__image');
-  lightboxImage.src = '';
-  lightboxImage.src = event.target.dataset.source
-  lightboxImage.alt = event.target.alt
-  onCloseModalWindow(lightbox);
-  onOpenModalWindow(lightbox);
+  refs.lightboxImage.src = event.target.dataset.source
+  refs.lightboxImage.alt = event.target.alt
+  refs.lightbox.classList.add('is-open')
+  onCloseModalWindow();
   onSwitchPicture();
 }
 
-function onOpenModalWindow(lightbox){
-  lightbox.classList.add('is-open')
-}
 
-function onCloseModalWindow (lightbox){
-  const closeModalBtn = document.querySelector('button[data-action="close-lightbox"]');
-  closeModalBtn.addEventListener('click' , () => {
-    lightbox.classList.remove('is-open')
+
+function onCloseModalWindow (){
+  refs.closeModalBtn.addEventListener('click' , () => {
+    closeModalWindow();
   });
-
-  const lightboxOverlay = document.querySelector('.lightbox__overlay');
-  lightboxOverlay.addEventListener('click' , () => {
-    lightbox.classList.remove('is-open')
+  refs.lightboxOverlay.addEventListener('click' , () => {
+    closeModalWindow();
   });
   document.addEventListener('keydown', (event) => {
     if(event.key === 'Escape'){
-      lightbox.classList.remove('is-open')
+      closeModalWindow();
     }
   });
 }
 
+function closeModalWindow (){
+  refs.lightbox.classList.remove('is-open')
+  refs.lightboxImage.src = '';
+  refs.lightboxImage.alt = '';
+  refs.closeModalBtn.removeEventListener('click',closeModalWindow);
+  refs.lightboxOverlay.removeEventListener('click',closeModalWindow);
+  document.removeEventListener('click',closeModalWindow);
+}
+
 function onSwitchPicture (){
   document.addEventListener('keydown', (event)=>{
-    const lightBoxImage = document.querySelector('.lightbox__image');
+
     let currentIndex = 0;
     galleryItems.forEach(img => {
-      if (img.original === lightBoxImage.src) {
+      if (img.original === refs.lightboxImage.src) {
         currentIndex = galleryItems.indexOf(img);
       }
     });
@@ -144,15 +154,15 @@ function onSwitchPicture (){
       if (nextIndex >= galleryItems.length) {
         nextIndex = 0;
       }
-      lightBoxImage.src = galleryItems[nextIndex].original;
-      lightBoxImage.alt = galleryItems[nextIndex].description;
+      refs.lightboxImage.src = galleryItems[nextIndex].original;
+      refs.lightboxImage.alt = galleryItems[nextIndex].description;
     }
     if (event.code === 'ArrowLeft') {
       if (previousIndex < 0) {
         previousIndex = galleryItems.length - 1;
       }
-      lightBoxImage.src = galleryItems[previousIndex].original;
-      lightBoxImage.alt = galleryItems[previousIndex].description;
+      refs.lightboxImage.src = galleryItems[previousIndex].original;
+      refs.lightboxImage.alt = galleryItems[previousIndex].description;
     }
   })
 }
