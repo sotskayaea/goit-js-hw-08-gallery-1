@@ -63,6 +63,9 @@ body {
 .gallery__link:hover {
   cursor: zoom-in;
 }
+.list{
+  border: 5px solid red;
+}
 
 /* Lightbox */
 .lightbox {
